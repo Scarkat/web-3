@@ -1,288 +1,101 @@
+/* Estilos globales */
 body {
-    background-color: #121212; /* Fondo muy oscuro */
-    color: #f0f0f0; /* Texto blanco/gris claro */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  color: #000;
+  /* CAMBIOS CLAVE: Eliminamos el centrado vertical y horizontal del body */
+  display: block; /* El body actúa como un bloque normal */
+  min-height: 100vh;
 }
 
-.app-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+/* Contenedor principal: Se convierte en un simple padding */
+div {
+  /* Eliminamos las restricciones de tamaño y los estilos de caja */
+  max-width: none;
+  width: auto;
+  margin: 0; /* Eliminamos el margen superior */
+  padding: 20px 40px; /* Solo agregamos un padding horizontal y vertical */
+  border: none; /* Eliminamos el borde */
+  border-bottom: 1px solid #000; /* Opcional: una línea para separar del resto de la página */
+  background-color: #fff;
+  box-shadow: none;
 }
 
-.app-header {
-    text-align: center;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #333;
-    margin-bottom: 30px;
+/* Títulos */
+h1 {
+  text-align: left; /* Alineamos el título a la izquierda */
+  margin-bottom: 10px;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 10px;
 }
 
-.app-header h1 {
-    font-size: 2.5em;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: #ffffff;
+h2 {
+  margin-top: 20px;
+  text-align: left; /* Alineamos el resultado a la izquierda */
 }
 
-.main-content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr; /* Columna izquierda (Calculadora) más pequeña que la derecha (Historial) */
-    gap: 30px;
+h3 {
+  margin-top: 30px;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #000;
+  padding-bottom: 5px;
 }
 
-.left-column, .right-column {
-    padding: 20px;
-    background-color: #1e1e1e; /* Color de fondo de la tarjeta */
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+/* Inputs y Botón para que se vean bien sin la restricción de ancho */
+input {
+  width: 250px; /* Establecemos un ancho fijo para que no se extiendan demasiado */
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #000;
+  border-radius: 0;
+  font-size: 1rem;
+  outline: none;
+  display: block; /* Hacemos que cada input ocupe su propia línea */
+  margin-bottom: 10px;
 }
 
-.calculator-section {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+input:focus {
+  border-color: #000;
+  outline: 1px solid #000;
 }
 
-.title-section {
-    color: #ffffff;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    font-weight: 400;
+/* Botón */
+button {
+  display: block;
+  width: 260px; /* Ajustamos al ancho del input + padding/border */
+  margin: 15px 5px;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid #000;
+  border-radius: 0;
+  background-color: #fff;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-input[type="text"],
-textarea {
-    padding: 12px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    background-color: #2c2c2c;
-    color: #f0f0f0;
-    font-size: 1em;
-    transition: border-color 0.3s;
+button:hover {
+  background-color: #000;
+  color: #fff;
 }
 
-input[type="text"]:focus,
-textarea:focus {
-    border-color: #ffffff;
-    outline: none;
+/* Historial */
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
 }
 
-/* Grupo de botones de operación */
-.button-group {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 5px;
+li {
+  padding: 10px 0; /* Quitamos padding horizontal */
+  border-bottom: 1px solid #000;
+  font-family: monospace;
 }
 
-.calculator-section button {
-    padding: 12px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: #ffffff; /* Azul oscuro */
-    color: black;
-    font-size: 0.9em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.calculator-section button:hover:not(:disabled) {
-    background-color: #ffffff;
-}
-
-.calculator-section button:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-/* Botón para cambiar de modo */
-.toggle-mode-btn {
-    background-color: #c4c4c4 !important;
-    font-weight: normal !important;
-}
-.toggle-mode-btn:hover:not(:disabled) {
-    background-color: #ffffff !important;
-}
-
-/* Área de resultados y errores */
-.result-area {
-    min-height: 40px;
-    margin-top: 10px;
-}
-.result-message, .error-message {
-    padding: 8px 0;
-    border-radius: 4px;
-    font-weight: bold;
-}
-.error-message {
-    color: #ff5722; /* Naranja/Rojo de error */
-}
-.result-message {
-    color: #4caf50; /* Verde de éxito */
-}
-.batch-info {
-    font-size: 0.9em;
-    color: #aaa;
-}
-
-.batch-output {
-    white-space: pre-wrap; /* Mantiene el formato del JSON */
-    word-break: break-all;
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    padding: 10px;
-    font-size: 0.8em;
-}
-
-/* ==================================== */
-/* Estilos del Historial (Derecha) */
-/* ==================================== */
-.history-section {
-    max-height: 70vh; /* Limita la altura */
-    overflow-y: auto; /* Permite desplazamiento */
-}
-
-/* Grupo de filtros (selectores) */
-.filter-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.filter-group select {
-    padding: 8px 10px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    background-color: #2c2c2c;
-    color: #f0f0f0;
-    font-size: 0.9em;
-    appearance: none; /* Oculta flecha nativa */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f0f0f0%22%20d%3D%22M287%2095.8l-137.9%20141.6L11.5%2095.8c-3.3-3.3-3.3-8.8%200-12.1%203.3-3.3%208.8-3.3%2012.1%200l125.8%20129.2L275%2083.7c3.3-3.3%208.8-3.3%2012.1%200%203.3%203.3%203.3%208.8%200%2012.1z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 10px top 50%;
-    background-size: 10px auto;
-}
-
-.history-list {
-    list-style: none;
-    padding: 0;
-}
-
-.history-item {
-    background: #2c2c2c;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    font-size: 0.95em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 5px solid #ffffff; /* Barra de acento */
-}
-
-.op-tag {
-    font-size: 0.7em;
-    font-weight: bold;
-    padding: 3px 6px;
-    border-radius: 3px;
-    margin-right: 10px;
-    color: #1e1e1e;
-}
-.op-sum { background-color: #4caf50;  } /* Verde */
-.op-subtract { background-color: #ffeb3b; } /* Amarillo */
-.op-multiply { background-color: #ff9800; } /* Naranja */
-.op-divide { background-color: #f44336; } /* Rojo */
-
-.date-time {
-    font-size: 0.8em;
-    color: #999;
-    margin-left: 10px;
-}
-
-.no-history {
-    color: #999;
-    text-align: center;
-    padding: 20px;
-}
-
-.queue-display h4 {
-    color: #ffffff;
-    font-size: 1em;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.queue-list {
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    border-radius: 4px;
-    padding: 10px;
-    min-height: 40px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-}
-
-.queue-item {
-    background-color: #ffffff; /* Color del botón */
-    color: rgb(0, 0, 0);
-    padding: 4px 8px;
-    border-radius: 3px;
-    font-size: 0.8em;
-    font-weight: bold;
-}
-
-/* ==================================== */
-/* Estilos de N-Inputs Dinámicos */
-/* ==================================== */
-
-.operand-input-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.operand-input-group input {
-    flex-grow: 1;
-}
-
-.operand-input-group .remove-operand-btn {
-    width: 30px;
-    padding: 0;
-    height: 38px; /* Ajustar altura para que coincida con el input */
-}
-
-.add-operand-btn {
-    background-color: #ffffff !important;
-    color: black !important;
-    font-size: 1em !important;
-    margin-top: 5px;
-}
-.add-operand-btn:hover {
-    background-color: #ffffff !important;
-}
-
-/* ==================================== */
-/* Responsividad (para móviles) */
-/* ==================================== */
-@media (max-width: 768px) {
-    .main-content-grid {
-        grid-template-columns: 1fr; /* Una sola columna en móvil */
-    }
-
-    .history-section {
-        max-height: 50vh; /* Más corta en móvil */
-    }
-
-    .app-header h1 {
-        font-size: 1.8em;
-    }
+li:last-child {
+  border-bottom: none;
 }
