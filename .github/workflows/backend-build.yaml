@@ -1,45 +1,48 @@
 name: Build and Push Docker Image
 
 on:
-    push:
-        branches:
-            - main
-        tags:
-            - 'v*.*.*'
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        permissions:
-            contents: read
-            packages: write # For uploading Github Container Registry (GHCR)
-        
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-            
-            - name: Log in to GitHub Container Registry
-              uses: docker/login-action@v3
-              with:
-                registry: ghcr.io
-                username: ${{ github.actor }}
-                password: ${{ secrets.GITHUB_TOKEN }}
-            
-            - name: Determine image tag
-              id: vars
-              run: |
-                if [[ "${GITHUB_REF}" == "tag" ]]; then
-                    echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-                else
-                    echo "TAG=latest" >> $GITHUB_ENV
-                fi
+    permissions:
+      contents: read
+      packages: write  # Needed to push to GHCR
 
-            - name: Build Docker Image
-              run: |
-                docker build -t ghcr.io/${{ github.repository }}:${{ env.TAG }} ./backend
-            
-            - name: Push Docker Image
-              run: |
-                docker push ghcr.io/${{ github.repository }}:${{ env.TAG }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set lowercase repo name and determine tag
+        id: vars
+        run: |
+          # Convert repo name (owner/name) to lowercase
+          echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+          # Determine if this is a tag push or a branch push
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          else
+            echo "TAG=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ env.REPO_LOWER }}:${{ env.TAG }} ./backend
+
+      - name: Push Docker Image
+        run: |
+          docker push ghcr.io/${{ env.REPO_LOWER }}:${{ env.TAG }}
