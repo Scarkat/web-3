@@ -1,4 +1,4 @@
-name: Build and Push Backend Docker Image
+name: Build and Push Frontend Docker Image
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     tags:
       - 'v*.*.*'
     paths:
-      - 'backend/**'
+      - 'frontend/**'
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write  # Needed to push to GHCR
+      packages: write
 
     steps:
       - name: Checkout code
@@ -31,20 +31,18 @@ jobs:
       - name: Set lowercase repo name and determine tag
         id: vars
         run: |
-          # Convert repo name (owner/name) to lowercase
           echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-          # Determine if this is a tag push or a branch push
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
           else
             echo "TAG=latest" >> $GITHUB_ENV
           fi
 
-      - name: Build Backend Docker Image
+      - name: Build Frontend Docker Image
         run: |
-          docker build -t ghcr.io/${{ env.REPO_LOWER }}:${{ env.TAG }} ./backend
+          docker build -t ghcr.io/${{ env.REPO_LOWER }}-frontend:${{ env.TAG }} ./frontend
 
-      - name: Push Backend Docker Image
+      - name: Push Frontend Docker Image
         run: |
-          docker push ghcr.io/${{ env.REPO_LOWER }}:${{ env.TAG }}
+          docker push ghcr.io/${{ env.REPO_LOWER }}-frontend:${{ env.TAG }}
+
