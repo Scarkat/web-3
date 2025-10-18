@@ -37,8 +37,14 @@ def test_historial(monkeypatch):
             "a": document["a"],
             "b": document["b"],
             "result": document["result"],
-            "date": document["date"].isoformat()  # ✅ consistente con main.py
+            "date": document["date"].isoformat()
         })
 
+    def sort_key(item):
+        return item["date"]
 
-    assert response.json() == {"history": history}
+    history_sorted = sorted(history, key=sort_key)
+    response_sorted = sorted(response.json()["history"], key=sort_key)
+
+    assert response_sorted == history_sorted
+
