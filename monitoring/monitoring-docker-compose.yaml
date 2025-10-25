@@ -9,13 +9,17 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - practicas_mongo-network
+      - desarrolloweb3_mongo-network
 
     grafana:
       image: grafana/grafana:latest
-      ports: 3001:3000
-      networks: practicas_mongo-network
-      depends_on: prometheus
+      container_name: grafana
+      ports:
+        - "3001:3000"
+      networks: 
+        - desarrolloweb3_mongo-network
+      depends_on:
+        - prometheus
       environment:
         - GF_SECURITY_ADMIN_PASSWORD=admin
         - GF_SECURITY_ADMIN_USER=admin
@@ -23,7 +27,7 @@ services:
         - grafana-storage:/var/lib/grafana
   
   networks:
-    practicas_mongo-network:
+    desarrolloweb3_mongo-network:
       external: true # Importante usar el mismo network que el resto de contenedores
 
       # Importante remplazar job por fastapi-backend dentro del dashboard de Grafana 

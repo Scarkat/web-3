@@ -2,6 +2,7 @@ import datetime
 from fastapi import FastAPI
 from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
 
@@ -55,4 +56,6 @@ def obtain_history():
         })
 
     return {"history": history}
+
+Instrumentator().instrument(app).expose(app)
 
