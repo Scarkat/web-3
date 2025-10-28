@@ -11,10 +11,7 @@ services:
       - mongo-network
 
   calculadora:
-    build:
-      context: ./backend
-      dockerfile: dockerfile.yml
-    image: calculadora-fast-api:latest
+    image: ghcr.io/scarkat/web-3/backend:main
     volumes:
       - ./backend:/app
     ports:
@@ -23,14 +20,9 @@ services:
       - mongo-network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: src/dockerfile
+    image: ghcr.io/scarkat/web-3-frontend:v1.0.1
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     environment:
       CHOKIDAR_USEPOLLING: true
     depends_on:
@@ -40,3 +32,4 @@ services:
 
 networks:
   mongo-network:
+    driver: bridge
