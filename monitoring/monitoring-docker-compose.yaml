@@ -5,29 +5,28 @@ services:
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
     command:
-      - '--config.file=/etc/prometheus/prometheus.yaml'
+      - "--config.file=/etc/prometheus/prometheus.yaml"
     ports:
       - "9090:9090"
     networks:
-      - desarrolloweb3_mongo-network
+      - practicas_mongo-network
+    
 
-    grafana:
-      image: grafana/grafana:latest
-      container_name: grafana
-      ports:
-        - "3001:3000"
-      networks: 
-        - desarrolloweb3_mongo-network
-      depends_on:
-        - prometheus
-      environment:
-        - GF_SECURITY_ADMIN_PASSWORD=admin
-        - GF_SECURITY_ADMIN_USER=admin
-      volumes:
-        - grafana-storage:/var/lib/grafana
-  
-  networks:
-    desarrolloweb3_mongo-network:
-      external: true # Importante usar el mismo network que el resto de contenedores
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - practicas_mongo-network
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana-data:/var/lib/grafana
 
-      # Importante remplazar job por fastapi-backend dentro del dashboard de Grafana 
+networks:
+  practicas_mongo-network:
+    external: true  # importante: usar el mismo network que tus otros contenedores

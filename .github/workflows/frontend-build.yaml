@@ -8,6 +8,9 @@ on:
       - 'v*.*.*'
     paths:
       - 'frontend/**'
+  pull_request:
+    paths:
+      - 'frontend/**'
 
 jobs:
   build:
@@ -15,10 +18,10 @@ jobs:
 
     permissions:
       contents: read
-      packages: write
+      packages: write  # Needed to push to GHCR
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Log in to GitHub Container Registry
@@ -31,18 +34,32 @@ jobs:
       - name: Set lowercase repo name and determine tag
         id: vars
         run: |
+          # Convert repo name (owner/name) to lowercase
           echo "REPO_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+          # Determine if this is a tag push or a branch push
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
           else
             echo "TAG=latest" >> $GITHUB_ENV
           fi
 
-      - name: Build Frontend Docker Image
-        run: |
-          docker build -t ghcr.io/${{ env.REPO_LOWER }}-frontend:${{ env.TAG }} ./frontend
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/frontend
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern=v{{version}}
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
-      - name: Push Frontend Docker Image
-        run: |
-          docker push ghcr.io/${{ env.REPO_LOWER }}-frontend:${{ env.TAG }}
-
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
