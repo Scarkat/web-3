@@ -9,7 +9,7 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - practicas_mongo-network
+      - mongo-network
     
 
   grafana:
@@ -18,7 +18,7 @@ services:
     ports:
       - "3001:3000"
     networks:
-      - practicas_mongo-network
+      - mongo-network
     depends_on:
       - prometheus
     environment:
@@ -28,5 +28,5 @@ services:
       - ./grafana-data:/var/lib/grafana
 
 networks:
-  practicas_mongo-network:
+  mongo-network:
     external: true  # importante: usar el mismo network que tus otros contenedores
