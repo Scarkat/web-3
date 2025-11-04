@@ -27,6 +27,30 @@ services:
     volumes:
       - ./grafana-data:/var/lib/grafana
 
+  loki:
+    image: mirror.gcr.io/grafana/loki:2.9.3
+    container_name: loki
+    command: -config.file=/etc/loki/config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/config.yaml
+      - ./loki-data:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - desarrolloweb3_mongo-network # <--- CORRECCIÓN
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    depends_on:
+      - loki
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+    networks:
+      - desarrolloweb3_mongo-network # <--- CORRECCIÓN
+
 networks:
   desarrolloweb3_mongo-network:
     external: true  # importante: usar el mismo network que tus otros contenedores
