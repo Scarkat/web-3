@@ -8,7 +8,7 @@ import os, sys, logging
 
 app = FastAPI()
 
-# set logging
+# set logging xddd
 logger = logging.getLogger("custom_logger")
 logging_data = os.getenv("LOG_LEVEL", "INFO").upper()
 
