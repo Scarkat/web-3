@@ -8,16 +8,18 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - mongo-network
+      - desarrolloweb3_mongo-network
 
   calculadora:
-    image: ghcr.io/scarkat/web-3/backend:main
+    # image: ghcr.io/scarkat/web-3/backend:main
+    build: 
+      context: ./backend
     volumes:
       - ./backend:/app
     ports:
       - "8089:8000"
     networks:
-      - mongo-network
+      - desarrolloweb3_mongo-network
 
   frontend:
     image: ghcr.io/scarkat/web-3-frontend:v1.0.1
@@ -28,8 +30,8 @@ services:
     depends_on:
       - calculadora
     networks:
-      - mongo-network
+      - desarrolloweb3_mongo-network
 
 networks:
-  mongo-network:
+  desarrolloweb3_mongo-network:
     driver: bridge
