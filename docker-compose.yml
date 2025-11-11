@@ -11,9 +11,7 @@ services:
       - desarrolloweb3_mongo-network
 
   calculadora:
-    # image: ghcr.io/scarkat/web-3/backend:main
-    build: 
-      context: ./backend
+    image: ghcr.io/scarkat/web-3/backend:main
     volumes:
       - ./backend:/app
     ports:
