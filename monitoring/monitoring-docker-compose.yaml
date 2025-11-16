@@ -37,7 +37,7 @@ services:
     ports:
       - "3100:3100"
     networks:
-      - desarrolloweb3_mongo-network # <--- CORRECCIÓN
+      - desarrolloweb3_mongo-network 
 
   promtail:
     image: grafana/promtail:latest
@@ -49,8 +49,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./promtail-config.yaml:/etc/promtail/config.yaml
     networks:
-      - desarrolloweb3_mongo-network # <--- CORRECCIÓN
+      - desarrolloweb3_mongo-network 
 
 networks:
   desarrolloweb3_mongo-network:
-    external: true  # importante: usar el mismo network que tus otros contenedores
+    external: true 
