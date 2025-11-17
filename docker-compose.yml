@@ -12,8 +12,6 @@ services:
 
   calculadora:
     image: ghcr.io/scarkat/web-3/backend:main
-    volumes:
-      - ./backend:/app
     ports:
       - "8089:8000"
     networks:

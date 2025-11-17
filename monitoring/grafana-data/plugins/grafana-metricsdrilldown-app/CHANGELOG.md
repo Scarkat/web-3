@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.0.22
+
+
+## 1.0.21
+
+##### Chores
+
+- rm pre-version script check (#844) (bb4155ee)
+- **deps:**
+  - update dependency eslint-config-prettier to v8.10.2 (#833) (570048e3)
+  - update dependency @types/node to v20.19.24 (#832) (cad8a0e3)
+  - update dependency webpack to v5.102.1 (#837) (716ca1ad)
+  - update dependency @grafana/assistant to v0.1.3 (#831) (8b75b59f)
+  - update dependency @grafana/scenes to v6.42.2 (#834) (15cf1df3)
+  - update dependency @grafana/tsconfig to v2.0.1 (#825) (05949515)
+  - update dependency typescript to v5.9.3 (#817) (de5ed58e)
+  - update dependency @swc/core to v1.14.0 (#812) (d2b54f48)
+  - update dependency sass to v1.93.3 (#815) (56dbac3e)
+  - update dependency leven to v4.1.0 (#814) (0543e672)
+  - pin dependencies (#785) (c8b31460)
+
+##### New Features
+
+- add breadcrumbs (#810) (12cc8fa4)
+- **MetricsList:** Remove configure Prometheus function button (#821) (833a4fba)
+
+##### Bug Fixes
+
+- update query with duplicate utf-8 metric names (#839) (fa366df7)
+- **Breakdown:** Fix missing panel data (#828) (fb277012)
+- **Sidebar:**
+  - Remove extra space and border radius (#823) (bfc38b7e)
+- **PluginInfo:** Fix missing Prometheus info (#822) (baa5fbb3)
+
 ## v1.0.20
 
 See <https://github.com/grafana/metrics-drilldown/releases/tag/v1.0.20>
@@ -128,6 +162,6 @@ See <https://github.com/grafana/metrics-drilldown/releases/tag/v1.0.0-1>
 
 See <https://github.com/grafana/metrics-drilldown/releases/tag/v1.0.0-0>
 
-## 0.1.0 (Unreleased)
+## 0.1.0
 
 Initial release.
