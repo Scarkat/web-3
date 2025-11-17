@@ -11,7 +11,7 @@ services:
       - desarrolloweb3_mongo-network
 
   calculadora:
-    image: ghcr.io/scarkat/web-3/backend:main
+    image: ghcr.io/scarkat/web-3:latest
     ports:
       - "8089:8000"
     networks:
