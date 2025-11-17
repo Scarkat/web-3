@@ -20,14 +20,15 @@ fake_collection_historial = fake_database.historial
 def test_sumar(monkeypatch, numeroA, numeroB, resultado):
     monkeypatch.setattr(main, "collection_historial", fake_collection_historial)
 
-    response = client.get(f"/calculadora-fast-api/sum?a={numeroA}&b={numeroB}")  # ✅ URL corregida
+    response = client.get(f"/calculator/sum?a={numeroA}&b={numeroB}") 
     assert response.status_code == 200
+    
     assert response.json() == {"a": numeroA, "b": numeroB, "result": resultado}
 
 def test_historial(monkeypatch):
     monkeypatch.setattr(main, "collection_historial", fake_collection_historial)
 
-    response = client.get("/calculadora-fast-api/history")
+    response = client.get("/calculator/history")
     assert response.status_code == 200
 
     expected_data = list(fake_collection_historial.find({}))
