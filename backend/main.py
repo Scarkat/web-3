@@ -1,137 +1,99 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
+import datetime, os, sys, logging
+from fastapi import FastAPI
 from pymongo import MongoClient
-import datetime
-import logging
-import os, sys
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from loki_logger_handler.loki_logger_handler import LokiLoggerHandler
 
-# -------------------------
-# Logger
-# -------------------------
+app = FastAPI()
+
+# set logging xddd aaaaaaagria
 logger = logging.getLogger("custom_logger")
 logging_data = os.getenv("LOG_LEVEL", "INFO").upper()
 
 if logging_data == "DEBUG":
     logger.setLevel(logging.DEBUG)
-elif logging_data == "INFO":
+else:
     logger.setLevel(logging.INFO)
 
+# set handler
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setLevel(logger.level)
-formatter = logging.Formatter("%(levelname)s: %(asctime)s - %(name)s - %(message)s")
+formatter = logging.Formatter(
+    "%(levelname)s: %(asctime)s - %(name)s - %(message)s"
+)
 console_handler.setFormatter(formatter)
 
-custom_handler = LokiLoggerHandler(
+# Create an instance of the custom handler
+loki_handler = LokiLoggerHandler(
     url="http://loki:3100/loki/api/v1/push",
     labels={"application": "FastApi"},
     label_keys={},
     timeout=10,
 )
 
+logger.addHandler(loki_handler)
 logger.addHandler(console_handler)
-logger.addHandler(custom_handler)
 logger.info("Logger initialized")
-
-# -------------------------
-# FastAPI setup
-# -------------------------
-app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# -------------------------
-# MongoDB
-# -------------------------
+# MongoDB connection setup
 client = MongoClient("mongodb://admin_user:web3@mongo:27017/")
 database = client.practica1
 collection_historial = database.historial
+saludo = "hola mundo!"
 
-# -------------------------
-# Error handling
-# -------------------------
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    logger.warning(f"400 Error - Bad Request: {exc.errors()} | URL: {request.url}")
-    return JSONResponse(
-        status_code=400,
-        content={"detail": exc.errors(), "body": exc.body},
-    )
+def imprimir_saludo():
+    print(saludo)
+    print("Imprimiendo saludo desde main.py")
 
-# Optional: custom handler for 400 errors in logic
-from fastapi import HTTPException
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    if exc.status_code == 400:
-        logger.warning(f"400 Error - Bad Request: {exc.detail} | URL: {request.url}")
-    else:
-        logger.error(f"{exc.status_code} Error: {exc.detail} | URL: {request.url}")
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail},
-    )
-
-# -------------------------
-# Routes
-# -------------------------
-@app.get("/calculator/sum")
+@app.get("/calculadora-fast-api/sum")
 def sum_numbers(a: float, b: float):
+    """
+    Adds two numbers passed as query parameters (?a=...&b=...)
+    Example: /calculator/sum?a=1&b=2
+    """
     result = a + b
+
+    # Save to the database
     document = {
+        "result": result,
         "a": a,
         "b": b,
-        "result": result,
         "date": datetime.datetime.now(tz=datetime.timezone.utc)
     }
+
+    logger.info(f"Operación suma exitoso")
+    logger.debug(f"Operación suma: a={a}, b={b}, resultado={result}")
+
     collection_historial.insert_one(document)
-    logger.info(f"Operación suma exitosa")
-    logger.debug(f"Operación suma: a={a}, b={b}, result={result}")
+
     return {"a": a, "b": b, "result": result}
 
-@app.get("/calculator/divide")
-def divide_numbers(a: float, b: float):
-    if b == 0:
-        logger.warning(f"400 Error - División por cero: a={a}, b={b}")
-        raise HTTPException(status_code=400, detail="No se puede dividir entre cero.")
-    
-    if a < 0:
-        logger.warning(f"400 Error - División con número negativo: a={a}, b={b}")
-        raise HTTPException(status_code=400, detail="No se puede dividir entre números negativos.")
-    
-    result = a / b
-    document = {
-        "a": a,
-        "b": b,
-        "result": result,
-        "date": datetime.datetime.now(tz=datetime.timezone.utc)
-    }
-    # collection_historial.insert_one(document)
-    logger.info(f"Operación dividir exitosa")
-    logger.debug(f"Operación dividir: a={a}, b={b}, result={result}")
-    return {"a": a, "b": b, "result": result}
-
-@app.get("/calculator/history")
+@app.get("/calculadora-fast-api/history")
 def obtain_history():
+    """
+    Returns the last 10 calculations performed.
+    """
+    # Fetch the last 10 records from the database, sorted by date descending
     records = collection_historial.find().sort("date", -1).limit(10)
+
     history = []
     for record in records:
         history.append({
-            "a": record.get("a"),
-            "b": record.get("b"),
-            "result": record.get("result"),
-            "date": record.get("date")
+            "a": record["a"],
+            "b": record["b"],
+            "result": record["result"],
+            "date": record["date"].isoformat()  # ✅ convertir a string ISO
         })
-    logger.info("Historial recuperado")
+
     return {"history": history}
 
 Instrumentator().instrument(app).expose(app)
