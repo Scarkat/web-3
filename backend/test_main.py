@@ -35,6 +35,7 @@ def test_historial(monkeypatch):
     history = []
     for document in expected_data:
         history.append({
+            "operation": document["operation"],
             "a": document["a"],
             "b": document["b"],
             "result": document["result"],
@@ -48,4 +49,5 @@ def test_historial(monkeypatch):
     response_sorted = sorted(response.json()["history"], key=sort_key)
 
     assert response_sorted == history_sorted
+
 
