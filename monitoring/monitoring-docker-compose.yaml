@@ -1,7 +1,7 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: desarrolloweb3_prometheus
     volumes:
       - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
     command:
@@ -9,15 +9,15 @@ services:
     ports:
       - '9090:9090'
     networks:
-      - desarrolloweb3_mongo-network
+      - desarrolloweb3_desarrolloweb3_mongo-network
 
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana
+    container_name: desarrolloweb3_grafana
     ports:
       - '3001:3000'
     networks:
-      - desarrolloweb3_mongo-network
+      - desarrolloweb3_desarrolloweb3_mongo-network
     depends_on:
       - prometheus
     environment:
@@ -28,7 +28,7 @@ services:
 
   loki:
     image: grafana/loki:latest
-    container_name: loki
+    container_name: desarrolloweb3_loki
     command: -config.file=/etc/loki/config.yaml
     volumes:
       - ./loki-config.yaml:/etc/loki/config.yaml
@@ -36,8 +36,8 @@ services:
     ports:
       - '3100:3100'
     networks:
-      - desarrolloweb3_mongo-network
+      - desarrolloweb3_desarrolloweb3_mongo-network
 
 networks:
-  desarrolloweb3_mongo-network:
+  desarrolloweb3_desarrolloweb3_mongo-network:
     external: true  # Make sure this network exists or create it
