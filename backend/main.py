@@ -13,6 +13,7 @@ from pymongo import MongoClient
 from prometheus_client import Counter, Histogram
 from prometheus_fastapi_instrumentator import Instrumentator
 from loki_logger_handler.loki_logger_handler import LokiLoggerHandler
+from fastapi.exceptions import RequestValidationError
 
 # ----------------------------
 # App, CORS, DB (Mongo)
@@ -110,6 +111,20 @@ def save_to_history(op: str, a: float, b: float, result: float):
 # ----------------------------
 # Error handler (consistent response + logging)
 # ----------------------------
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # LOG: Entrada inválida o parámetros no numéricos
+    logger.error(
+        "Entrada inválida en request %s - detalle=%s", 
+        request.url.path, 
+        exc.errors()
+    )
+    return JSONResponse(
+        status_code=400,
+        content={"detail": "Parámetros inválidos o no numéricos", "errors": exc.errors()},
+    )
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     # Log the error with details
@@ -150,6 +165,8 @@ def calculate_operation(op: str, a: float, b: float) -> float:
         return a * b
     if op == "divide":
         if b == 0:
+            # LOG ERROR: división entre cero detectada
+            logger.error("Intento de división por cero: a=%s b=%s", a, b)
             raise HTTPException(
                 status_code=400,
                 detail={"error": "División por cero", "operation": "divide", "operandos": [a, b]},
@@ -160,6 +177,8 @@ def calculate_operation(op: str, a: float, b: float) -> float:
 
 def calculate_batch_result(op: str, nums: List[float]) -> float:
     if len(nums) < 2:
+        # LOG ERROR: número insuficiente de operandos
+        logger.error("Batch con operandos insuficientes para '%s': %s", op, nums)
         raise HTTPException(
             status_code=400,
             detail={
