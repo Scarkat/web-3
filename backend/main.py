@@ -61,9 +61,9 @@ try:
     logger.addHandler(loki_handler)
 except Exception as e:
     # If the handler fails to initialize (e.g., missing package), keep going but log locally.
-    logger.warning("No se pudo inicializar LokiLoggerHandler: %s", e)
+    logger.warning("Log: No se pudo inicializar LokiLoggerHandler: %s", e)
 
-logger.info("Logger initialized (level=%s)", LOG_LEVEL)
+logger.info("Log: Logger initialized (level=%s)", LOG_LEVEL)
 
 # ----------------------------
 # Prometheus metrics
@@ -104,7 +104,7 @@ def save_to_history(op: str, a: float, b: float, result: float):
         collection_historial.insert_one(document)
     except Exception as e:
         # If DB fails, log error but do not raise internal server error for the caller
-        logger.error("Error guardando historial en Mongo: %s", e)
+        logger.error("Log: Error guardando historial en Mongo: %s", e)
         # Optionally increment a DB error metric here in the future
 
 
@@ -115,7 +115,7 @@ def save_to_history(op: str, a: float, b: float, result: float):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     # LOG: Entrada inválida o parámetros no numéricos
     logger.error(
-        "Entrada inválida en request %s - detalle=%s", 
+        "Log: Entrada inválida en request %s - detalle=%s", 
         request.url.path, 
         exc.errors()
     )
@@ -166,7 +166,7 @@ def calculate_operation(op: str, a: float, b: float) -> float:
     if op == "divide":
         if b == 0:
             # LOG ERROR: división entre cero detectada
-            logger.error("Intento de división por cero: a=%s b=%s", a, b)
+            logger.error("Log: Intento de división por cero: a=%s b=%s", a, b)
             raise HTTPException(
                 status_code=400,
                 detail={"error": "División por cero", "operation": "divide", "operandos": [a, b]},
@@ -178,7 +178,7 @@ def calculate_operation(op: str, a: float, b: float) -> float:
 def calculate_batch_result(op: str, nums: List[float]) -> float:
     if len(nums) < 2:
         # LOG ERROR: número insuficiente de operandos
-        logger.error("Batch con operandos insuficientes para '%s': %s", op, nums)
+        logger.error("Log: Batch con operandos insuficientes para '%s': %s", op, nums)
         raise HTTPException(
             status_code=400,
             detail={
@@ -223,7 +223,7 @@ def sum_numbers(a: float = Query(...), b: float = Query(...)):
             validate_no_negatives([a, b], op)
             result = calculate_operation(op, a, b)
             save_to_history(op, a, b, result)
-            logger.info("Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
+            logger.info("Log: Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
             return {"a": a, "b": b, "result": result}
         except HTTPException:
             OPERATION_ERRORS.labels(op).inc()
@@ -243,14 +243,14 @@ def subtract_numbers(a: float = Query(...), b: float = Query(...)):
             validate_no_negatives([a, b], op)
             result = calculate_operation(op, a, b)
             save_to_history(op, a, b, result)
-            logger.info("Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
+            logger.info("Log: Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
             return {"a": a, "b": b, "result": result}
         except HTTPException:
             OPERATION_ERRORS.labels(op).inc()
             raise
         except Exception as e:
             OPERATION_ERRORS.labels(op).inc()
-            logger.exception("Error inesperado en %s: %s", op, e)
+            logger.exception("Log: Error inesperado en %s: %s", op, e)
             raise HTTPException(status_code=500, detail={"error": "Error interno", "message": str(e)})
 
 
@@ -263,14 +263,14 @@ def multiply_numbers(a: float = Query(...), b: float = Query(...)):
             validate_no_negatives([a, b], op)
             result = calculate_operation(op, a, b)
             save_to_history(op, a, b, result)
-            logger.info("Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
+            logger.info("Log: Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
             return {"a": a, "b": b, "result": result}
         except HTTPException:
             OPERATION_ERRORS.labels(op).inc()
             raise
         except Exception as e:
             OPERATION_ERRORS.labels(op).inc()
-            logger.exception("Error inesperado en %s: %s", op, e)
+            logger.exception("Log: Error inesperado en %s: %s", op, e)
             raise HTTPException(status_code=500, detail={"error": "Error interno", "message": str(e)})
 
 
@@ -283,14 +283,14 @@ def divide_numbers(a: float = Query(...), b: float = Query(...)):
             validate_no_negatives([a, b], op)
             result = calculate_operation(op, a, b)
             save_to_history(op, a, b, result)
-            logger.info("Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
+            logger.info("Log: Operación %s exitosa: a=%s b=%s result=%s", op, a, b, result)
             return {"a": a, "b": b, "result": result}
         except HTTPException:
             OPERATION_ERRORS.labels(op).inc()
             raise
         except Exception as e:
             OPERATION_ERRORS.labels(op).inc()
-            logger.exception("Error inesperado en %s: %s", op, e)
+            logger.exception("Log: Error inesperado en %s: %s", op, e)
             raise HTTPException(status_code=500, detail={"error": "Error interno", "message": str(e)})
 
 
@@ -307,15 +307,15 @@ def batch_operations(items: List[BatchItem]):
             try:
                 validate_no_negatives(item.nums, op)
                 result_value = calculate_batch_result(op, item.nums)
-                logger.info("Batch op %s exitosa: nums=%s result=%s", op, item.nums, result_value)
+                logger.info("Log: Batch op %s exitosa: nums=%s result=%s", op, item.nums, result_value)
                 results.append({"op": op, "result": result_value})
             except HTTPException as he:
                 OPERATION_ERRORS.labels(op).inc()
-                logger.warning("Batch op %s falló: %s", op, he.detail)
+                logger.warning("Log: Batch op %s falló: %s", op, he.detail)
                 results.append(he.detail)
             except Exception as e:
                 OPERATION_ERRORS.labels(op).inc()
-                logger.exception("Error inesperado en batch op %s: %s", op, e)
+                logger.exception("Log: Error inesperado en batch op %s: %s", op, e)
                 results.append({"error": "Error interno", "message": str(e)})
     return results
 
@@ -355,5 +355,5 @@ def obtain_history(
             }
         )
 
-    logger.debug("Historial consultado: filter=%s order_by=%s sort_order=%s", query_filter, order_by, sort_order)
+    logger.debug("Log: Historial consultado: filter=%s order_by=%s sort_order=%s", query_filter, order_by, sort_order)
     return {"history": history}
