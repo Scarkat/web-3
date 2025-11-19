@@ -34,7 +34,7 @@ function App() {
             
             if (!res.ok) {
                 // Manejo de errores estructurados del backend
-                const errorMsg = data.detail?.error || data.detail || "Error desconocido";
+                const errorMsg = data.detail?.error || data.detail || "Error";
                 setError(errorMsg);
                 return null;
             }

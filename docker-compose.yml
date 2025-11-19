@@ -19,7 +19,7 @@ services:
     pull_policy: always
 
   frontend:
-    image: ghcr.io/scarkat/web-3-frontend:v1.0.1
+    image: ghcr.io/scarkat/web-3/frontend:sha-b6c43f5
     ports:
       - "3000:3000"
     environment:
